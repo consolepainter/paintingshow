@@ -7,17 +7,15 @@
         </li>
       </ul>
     </div>
-    <div class="content">
-      <div class="item" v-for="(item, index) in itemData" :key="index">
-        <div class="item-main" :style="{backgroundImage:'url(' + item.mainBgImg + ')'}">
-          <img class="img" :src="item.mainImg">
-        </div>
-        <div class="item-bg">
-          <div class="img" :style="{backgroundImage: 'url(' + item.bgImg + ')'}"></div>
-          <div class="color" :style="{backgroundColor: item.bgColor}"></div>
-        </div>
-        <div class="item-label"></div>
+    <div :class="{'item': true, 'noItem': index != currentIndex}" v-for="(item, index) in itemData" :key="index">
+      <div class="item-main" :style="{backgroundImage:'url(' + item.mainBgImg + ')'}">
+        <img class="img" :src="item.mainImg">
       </div>
+      <div class="item-bg">
+        <div class="img" :style="{backgroundImage: 'url(' + item.bgImg + ')'}"></div>
+        <div class="color" :style="{backgroundColor: item.bgColor}"></div>
+      </div>
+      <div class="item-label"></div>
     </div>
   </div>
 </template>
@@ -47,19 +45,19 @@ export default {
             mainImg: require("../../assets/img/img_slide_04.ff41772.jpg"), 
             mainBgImg: require("../../assets/img/bg_slide_04.bb6d3a2.jpg"), 
             bgImg: require("../../assets/img/bg_net_pink.71f6e3d.svg"), 
-            bgColor: "#e593c8",
+            bgColor: "#ffc9ad",
           },
           {
             mainImg: require("../../assets/img/img_slide_04.ff41772.jpg"), 
             mainBgImg: require("../../assets/img/bg_slide_04.bb6d3a2.jpg"), 
             bgImg: require("../../assets/img/bg_net_pink.71f6e3d.svg"), 
-            bgColor: "#e593c8",
+            bgColor: "#ffe200",
           },
           {
             mainImg: require("../../assets/img/img_slide_04.ff41772.jpg"), 
             mainBgImg: require("../../assets/img/bg_slide_04.bb6d3a2.jpg"), 
             bgImg: require("../../assets/img/bg_net_pink.71f6e3d.svg"), 
-            bgColor: "#e593c8",
+            bgColor: "#ffeace",
           },
           {
             mainImg: require("../../assets/img/img_slide_04.ff41772.jpg"), 
@@ -80,20 +78,11 @@ export default {
     handleDom: function() {
       // 1.获取要操作的元素
       const swiper = document.querySelector(".swiper");
-      const swiperEl = document.querySelector(".content");
-      const swiperEls = swiperEl.getElementsByClassName("item");
+      const swiperEls = document.getElementsByClassName("item");
 
       // 2.获取长度和swiper宽度
       this.slideCount =  swiperEls.length;
       this.swiperWidth = swiper.offsetWidth;
-
-      // 3.如果大于1个, 那么在前后分别添加一个slide
-      if(this.slideCount > 1) {
-        const cloneFirst = swiperEls[0].cloneNode(true);
-        //const cloneLast = slidesEls[this.slideCount - 1].cloneNode(true);
-        swiperEl.appendChild(cloneFirst);
-        //swiperEl.insertBefore(cloneLast, slidesEls[0]);
-      }
 
       //鼠标经过swiper停止定时器
       swiper.addEventListener("mouseenter", () => {
@@ -103,37 +92,26 @@ export default {
 
       //鼠标离开swiper开启定时器
       swiper.addEventListener("mouseleave", () => {
-        this.antoTransfrom(this.swiperWidth);
+        this.antoTransfrom();
       })
 
-      this.antoTransfrom(this.swiperWidth);
+      this.antoTransfrom();
     },
 
     //自动滚动
-    antoTransfrom: function(swiperWidth) {
-      const content = document.querySelector(".content");
+    antoTransfrom: function() {
       this.timer = setInterval(() => {
         this.currentIndex++;
-        if(this.currentIndex == this.slideCount + 1) {
-          content.style.left = 0;
+        if(this.currentIndex === this.slideCount) {
           this.currentIndex = 0;
-          content.style.transition = "none";
         } 
-        else {
-          content.style.transition = "all .3s";
-        }
-        const translatex = -this.currentIndex * swiperWidth;
-        content.style.transform = "translateX(" + translatex + "px)";
       }, this.interval)
     },
 
     //点击跳转到对应页面
     setPosition: function(index) {
       this.currentIndex = index; //确保自动滚动从该索引号开始
-      const content = document.querySelector(".content");
-      const translatex = -index * this.swiperWidth;
-      content.style.transition = "all .3s";
-      content.style.transform = "translateX(" + translatex + "px)";
+      console.log(index)
     }
   }
 } 
@@ -183,9 +161,12 @@ export default {
     width: 500%;
     height: 100%;
   }
+  .noItem {
+    display: none;
+  }
   .item {
     position: relative;
-    width: 100rem;
+    width: 100%;
     height: 100%;
     .item-bg {
       position: absolute;
