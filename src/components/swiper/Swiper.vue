@@ -3,15 +3,15 @@
     <div class="indicator" v-if="showIndicator && slideCount>1">
       <ul>
         <li v-for="(item, index) in slideCount" :key="index" @click="setPosition(index)">
-          <div :class="{active: index === currentIndex}"></div>
+          <div :class="{active: index === currentIndex }"></div>
         </li>
       </ul>
     </div>
-    <div :class="{'item': true, 'noItem': index != currentIndex}" v-for="(item, index) in itemData" :key="index">
-      <div class="item-main" :style="{backgroundImage:'url(' + item.mainBgImg + ')'}">
-        <img class="img" :src="item.mainImg">
+    <div :class="{'item': true, 'noItem': index != leaveIndex && index != currentIndex}" v-for="(item, index) in itemData" :key="index">
+      <div :class="{'item-main': true, 'enterMainItem': index === enterIndex, 'leaveMainItem': index === leaveIndex}" :style="{backgroundImage:'url(' + item.mainBgImg + ')'}">
+        <img class="img"  :src="item.mainImg">
       </div>
-      <div class="item-bg">
+      <div :class="{'item-bg': true, 'enterItem': index === enterIndex, 'leaveItem': index === leaveIndex}">
         <div class="img" :style="{backgroundImage: 'url(' + item.bgImg + ')'}"></div>
         <div class="color" :style="{backgroundColor: item.bgColor}"></div>
       </div>
@@ -26,6 +26,10 @@ export default {
   props: {
      interval: {//自动播放时间间隔
 	    type: Number,
+       default: 8000
+     },
+     leaveTime: {//自动播放时间间隔
+	    type: Number,
        default: 3000
      },
      showIndicator: {
@@ -35,27 +39,28 @@ export default {
   },
   data: function () {
 		  return {
-        slideCount: 0, // 元素个数
-        swiperWidth: 0, // swiper的宽度
-        swiperStyle: {}, // swiper样式
-        currentIndex: 0, // 当前的index
-        scrolling: false, // 是否正在滚动
+        slideCount: 0, //元素个数
+        swiperWidth: 0, //swiper的宽度
+        currentIndex: 0, //当前的index
+        scrolling: false, //是否正在滚动
+        enterIndex: null, //将要展示的图片
+        leaveIndex: null, //即将展示完毕的图片
         itemData: [
           {
             mainImg: require("../../assets/img/img_slide_04.ff41772.jpg"), 
-            mainBgImg: require("../../assets/img/bg_slide_04.bb6d3a2.jpg"), 
+            mainBgImg: require("../../assets/img/bg_slide_00.ba0d2b2.jpg"), 
             bgImg: require("../../assets/img/bg_net_pink.71f6e3d.svg"), 
             bgColor: "#ffc9ad",
           },
           {
             mainImg: require("../../assets/img/img_slide_04.ff41772.jpg"), 
-            mainBgImg: require("../../assets/img/bg_slide_04.bb6d3a2.jpg"), 
+            mainBgImg: require("../../assets/img/bg_slide_01.f7b75cb.jpg"), 
             bgImg: require("../../assets/img/bg_net_pink.71f6e3d.svg"), 
             bgColor: "#ffe200",
           },
           {
             mainImg: require("../../assets/img/img_slide_04.ff41772.jpg"), 
-            mainBgImg: require("../../assets/img/bg_slide_04.bb6d3a2.jpg"), 
+            mainBgImg: require("../../assets/img/bg_slide_02.312ad9c.jpg"), 
             bgImg: require("../../assets/img/bg_net_pink.71f6e3d.svg"), 
             bgColor: "#ffeace",
           },
@@ -101,17 +106,22 @@ export default {
     //自动滚动
     antoTransfrom: function() {
       this.timer = setInterval(() => {
+        this.leaveIndex = this.currentIndex;
         this.currentIndex++;
+        this.enterIndex = this.currentIndex;
         if(this.currentIndex === this.slideCount) {
           this.currentIndex = 0;
+          this.enterIndex = 0;
         } 
+        setTimeout(() => {
+           this.leaveIndex = null;
+        },this.leaveTime)
       }, this.interval)
     },
 
     //点击跳转到对应页面
     setPosition: function(index) {
       this.currentIndex = index; //确保自动滚动从该索引号开始
-      console.log(index)
     }
   }
 } 
@@ -149,23 +159,35 @@ export default {
         }
         .active {
           height: 0.1rem;
-          background: #333;
-          
+          background: #333;       
         }
       }
     }
   }
-  .content {
-    position: absolute;
-    display: flex;
-    width: 500%;
-    height: 100%;
-  }
   .noItem {
     display: none;
   }
+  .enterItem {
+    z-index: 2;
+    animation: changeWidth 3s;
+  }
+  .leaveItem {
+    z-index: 1;
+    animation: rotatey 3s;
+    transform-origin: 100% 50%;
+  }
+  .enterMainItem {
+    z-index: 2;
+    animation: changeMainWidth 3s;
+  }
+  .leaveMainItem {
+    z-index: 1;
+    animation: rotatey 1.5s;
+    transform-origin: 100% 50%;
+  }
+  
   .item {
-    position: relative;
+    position: absolute;
     width: 100%;
     height: 100%;
     .item-bg {
@@ -179,7 +201,7 @@ export default {
         height: 100%;
         opacity: .6;
         z-index: 1;
-        animation: movebg 60s infinite alternate;
+        animation: movebg 20s;      
       }
       .color {
         position: absolute;
@@ -205,11 +227,40 @@ export default {
 
  @keyframes movebg {
     0% {
-      background-position: 50% 50%;
+      transform: scale(0px);
+    }
+    10% {
+      transform: scale(1.05, 1);
     }
     100% {
-      background-position: 0% 50%;
+      transform: scale(1.05, 1) translateX(50px);
     }
  } 
-  
+
+ @keyframes changeWidth {
+    0% {
+      width: 0%;
+    }
+    50% {
+      width: 100%;
+    }
+ } 
+
+ @keyframes changeMainWidth {
+    0% {
+      width: 0%;
+    }
+    50% {
+      width: 70%;
+    }
+ } 
+
+  @keyframes rotatey {
+     0% {
+      transform: rotateY(0deg);
+    }
+    100% {
+      transform: rotateY(90deg);
+    }
+ } 
 </style>
