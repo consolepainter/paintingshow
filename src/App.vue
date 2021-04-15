@@ -1,8 +1,9 @@
 <template>
   <div id="app">
     <div id="nav">
-      <router-link to="/">Home</router-link> 
-      <router-link to="/about">About</router-link>
+      <router-link to="/">轮播图</router-link> 
+      <router-link to="/about">遮罩效果</router-link>
+      <router-link to="/logo">SVG案例</router-link>
     </div>
     <router-view/>
   </div>
@@ -19,15 +20,19 @@
 
 #nav {
   position: absolute;
-  /* padding: 30px; */
+  top: 6%;
+  right: 6%;
+  display: flex;
+  flex-direction: column;
+  z-index: 10; 
 }
 
 #nav a {
   font-weight: bold;
-  color: #2c3e50;
+  color: #b598a1;
 }
 
 #nav a.router-link-exact-active {
-  color: #42b983;
+  color: #4c1f24;
 }
 </style>

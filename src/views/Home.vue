@@ -5,14 +5,14 @@
 </template>
 
 <script>
-import Swiper from '../components/swiper/Swiper.vue';
+import Swiper from "../components/swiper/Swiper.vue";
 
 export default {
-  name: 'Home',
+  name: "Home",
   components: {
     Swiper,
-  }
-}
+  },
+};
 </script>
 
 <style scoped>
